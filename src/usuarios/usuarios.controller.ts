@@ -64,9 +64,9 @@ export class UsuariosController {
 
   @ApiBody({ type: CreateUsuarioDto })
   @Permission('create-usuarios')
-  @ApiConsumes('multipart/form-data')  // Acepta form-data (necesario si usas Swagger)
   @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
+  @UseInterceptors(FileInterceptor('')) // Interceptor para procesar form-data
+  create(@Body() createUsuarioDto: any) {
     return this.usuariosService.create(createUsuarioDto);
   }
   

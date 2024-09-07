@@ -71,6 +71,8 @@ export class DetallepermisosService {
       message: 'Permisos creados correctamente',
     };
   }
+
+
   async findAll(): Promise<any> {
     // Obtener todos los detalles de permisos
     const detallePermisos = await this.detallePermisoRepository.find({
@@ -79,11 +81,9 @@ export class DetallepermisosService {
   
     // Agrupar datos por usuario
     const usuarios = new Map<number, any>();
-    // Agrupar datos por módulo
-    const modulos = new Map<number, any>();
   
     detallePermisos.forEach((detalle) => {
-      const { usuario, sub_modulo } = detalle;
+      const { usuario } = detalle;
   
       // Filtrar usuarios activos
       if (usuario.estado) {
@@ -101,43 +101,11 @@ export class DetallepermisosService {
             },
           });
         }
-  
-        // Agrupar módulos y sub-módulos
-        const moduloId = sub_modulo.modulos.id;
-        if (!modulos.has(moduloId)) {
-          modulos.set(moduloId, {
-            id: moduloId,
-            nombre_modulo: sub_modulo.modulos.nombre_modulo,
-            habilitado: detalle.habilitado, // Puedes ajustar según la lógica deseada
-            sub_modulos: [],
-          });
-        }
-  
-        const modulo = modulos.get(moduloId);
-        modulo.sub_modulos.push({
-          id: sub_modulo.id,
-          nombre_submodulo: sub_modulo.nombre_submodulo,
-          permisos: [
-            { type: 'create', value: detalle.create },
-            { type: 'read', value: detalle.read },
-            { type: 'update', value: detalle.update },
-            { type: 'delete', value: detalle.delete },
-          ],
-        });
       }
     });
   
-    // Verificar y ordenar módulos
-    const modulosArray = Array.from(modulos.values());
-    const sortedModulos = modulosArray.sort((a, b) => a.id - b.id);
-  
-    // Estructurar los datos finales como un objeto dentro de un arreglo
-    const resultado = [
-      {
-        usuarios: Array.from(usuarios.values()).sort((a, b) => a.id - b.id),
-        modulos: sortedModulos,
-      }
-    ];
+    // Convertir los mapas a arreglos y ordenar
+    const resultado = Array.from(usuarios.values()).sort((a, b) => a.id - b.id);
   
     return resultado;
   }
@@ -212,7 +180,7 @@ export class DetallepermisosService {
     // Estructurar los datos finales como un arreglo
     const resultado = [
       {
-        usuarios: [
+        usuario: [
           {
             id: usuario.id,
             username: usuario.username,

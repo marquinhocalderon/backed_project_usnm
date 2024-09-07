@@ -95,7 +95,7 @@ export class UsuarioDto2 {
 // Define the main DTO that includes arrays of users and modules
 export class MainDto {
   @ApiProperty({ type: [UsuarioDto] })
-  usuarios: UsuarioDto[];
+  usuario: UsuarioDto[];
 
   @ApiProperty({ type: [ModuloDto] })
   modulos_para_actualizar: ModuloDto[];
@@ -104,10 +104,4 @@ export class MainDto {
   modulos_para_mostrar_menu: ModulosParaMenu[];
 }
 
-export class MainDto2 {
-  @ApiProperty({ type: [UsuarioDto2] })
-  usuarios: UsuarioDto2[];
 
-  @ApiProperty({ type: [ModuloDto] })
-  modulos_para_actualizar: ModuloDto[];
-}

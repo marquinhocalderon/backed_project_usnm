@@ -5,7 +5,7 @@ import { UpdateDetallepermisoDto, UpdatePeticiones } from './dto/update-detallep
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Permission } from '../auth/decorators/permission.decorator';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { MainDto, MainDto2 } from './dto/get-usuarios-permisos.dto';
+import { MainDto, UsuarioDto2 } from './dto/get-usuarios-permisos.dto';
 
 
 
@@ -18,7 +18,7 @@ export class DetallepermisosController {
   // create(@Body() createDetallepermisoDto: any) {
   //   return this.detallepermisosService.create();
   // }
-  @ApiBody({ type: MainDto2 })
+  @ApiBody({ type: UsuarioDto2 })
   @ApiTags('Usuarios')
   @Get('/usuarios/all')
   @Permission('read-usuarios')

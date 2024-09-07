@@ -79,7 +79,7 @@ export class AuthGuard implements CanActivate {
       }
     } catch (error) {
       if (error instanceof TokenExpiredError) {
-        throw new UnauthorizedException('Token vencido');
+        throw new UnauthorizedException('Token vencido, Inicie sesión nuevamente');
       }
       // Diferenciar entre el error de permisos y el error de token
       throw new UnauthorizedException(

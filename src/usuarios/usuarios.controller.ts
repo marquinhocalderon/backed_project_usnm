@@ -25,7 +25,7 @@ import {
   nombreComoSeGuarda,
   validarTipodeArchivoGuardar,
 } from './helpers/imagenes.helpers';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { GetPerfilDto } from 'src/perfiles/dto/get-perfile.dto';
 import { GetUsuarioDto } from './dto/get-usuario.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
@@ -64,6 +64,7 @@ export class UsuariosController {
 
   @ApiBody({ type: CreateUsuarioDto })
   @Permission('create-usuarios')
+  @ApiConsumes('multipart/form-data')  // Acepta form-data (necesario si usas Swagger)
   @Post()
   create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);

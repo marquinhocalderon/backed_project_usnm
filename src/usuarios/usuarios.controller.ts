@@ -66,7 +66,7 @@ export class UsuariosController {
   @Permission('create-usuarios')
   @Post()
   @UseInterceptors(FileInterceptor('')) // Interceptor para procesar form-data
-  create(@Body() createUsuarioDto: any) {
+  create(@Body() createUsuarioDto: CreateUsuarioDto) {
     return this.usuariosService.create(createUsuarioDto);
   }
   

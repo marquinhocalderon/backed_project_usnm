@@ -47,13 +47,6 @@ export class UpdatePeticiones {
     @IsNotEmpty({ message: 'El campo id no debe estar vacío' })
     @IsNumber({}, { message: 'El campo id debe ser de tipo numérico' })
     id: number;
-    @ApiProperty()
-    @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) // Trim whitespaces at the beginning and end
-    @IsNotEmpty({ message: 'El campo nombre_submodulo no debe estar vacío' })
-    @IsString({ message: 'El campo nombre_submodulo tiene que ser una cadena de caracteres' })
-    @MaxLength(50, { message: 'El campo nombre_submodulo debe tener un máximo de 50 caracteres' })
-    @MinLength(2, { message: 'El campo nombre_submodulo debe tener un mínimo de 2 caracteres' })
-    nombre_submodulo: string;
 
      @ApiProperty({ type: [PermisoDto] })
     @IsNotEmpty({ message: 'El campo permisos no debe estar vacío' })

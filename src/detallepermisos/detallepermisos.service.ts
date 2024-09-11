@@ -72,19 +72,18 @@ export class DetallepermisosService {
     };
   }
 
-
   async findAll(): Promise<any> {
     // Obtener todos los detalles de permisos
     const detallePermisos = await this.detallePermisoRepository.find({
       relations: ['usuario', 'sub_modulo', 'sub_modulo.modulos'],
     });
-  
+
     // Agrupar datos por usuario
     const usuarios = new Map<number, any>();
-  
+
     detallePermisos.forEach((detalle) => {
       const { usuario } = detalle;
-  
+
       // Filtrar usuarios activos
       if (usuario.estado) {
         // Agrupar usuarios
@@ -103,15 +102,12 @@ export class DetallepermisosService {
         }
       }
     });
-  
+
     // Convertir los mapas a arreglos y ordenar
     const resultado = Array.from(usuarios.values()).sort((a, b) => a.id - b.id);
-  
+
     return resultado;
   }
-  
-  
-  
 
   async findOne(id: number): Promise<any[]> {
     // Verificar si el usuario existe
@@ -119,28 +115,30 @@ export class DetallepermisosService {
       where: { id },
       relations: ['perfiles'], // Asegúrate de incluir las relaciones necesarias
     });
-  
+
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado.');
     }
-  
+
     // Obtener todos los detalles de permisos para el usuario específico
     const detallePermisos = await this.detallePermisoRepository.find({
       where: { usuario: { id } },
       relations: ['usuario', 'sub_modulo', 'sub_modulo.modulos'],
     });
-  
+
     // Verificar si no se encontraron permisos para el usuario
     if (detallePermisos.length === 0) {
-      throw new NotFoundException('No se encontraron permisos para este usuario.');
+      throw new NotFoundException(
+        'No se encontraron permisos para este usuario.',
+      );
     }
-  
+
     // Agrupar datos por módulo
     const modulos = new Map<number, any>();
-  
+
     detallePermisos.forEach((detalle) => {
       const { sub_modulo } = detalle;
-  
+
       // Agrupar módulos y sub-módulos
       const moduloId = sub_modulo.modulos.id;
       if (!modulos.has(moduloId)) {
@@ -151,7 +149,7 @@ export class DetallepermisosService {
           sub_modulos: [],
         });
       }
-  
+
       const modulo = modulos.get(moduloId);
       modulo.sub_modulos.push({
         id: sub_modulo.id,
@@ -164,10 +162,12 @@ export class DetallepermisosService {
         ],
       });
     });
-  
+
     // Ordenar módulos por id en forma descendente
-    const sortedModulos = Array.from(modulos.values()).sort((a, b) => b.id - a.id);
-  
+    const sortedModulos = Array.from(modulos.values()).sort(
+      (a, b) => b.id - a.id,
+    );
+
     // Filtrar los módulos habilitados y eliminar los submódulos
     const modulosHabilitados = sortedModulos
       .filter((modulo) => modulo.habilitado)
@@ -176,7 +176,7 @@ export class DetallepermisosService {
         nombre_modulo: modulo.nombre_modulo,
         habilitado: modulo.habilitado,
       }));
-  
+
     // Estructurar los datos finales como un arreglo
     const resultado = [
       {
@@ -195,41 +195,42 @@ export class DetallepermisosService {
         ],
         modulos_para_actualizar: sortedModulos,
         modulos_para_mostrar_menu: modulosHabilitados,
-      }
+      },
     ];
-  
+
     return resultado;
   }
-  
-  
+
   async findOne2(id: number): Promise<any[]> {
     // Verificar si el usuario existe
     const usuario = await this.usuarioRepository.findOne({
       where: { id },
       relations: ['perfiles'], // Asegúrate de incluir las relaciones necesarias
     });
-  
+
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado.');
     }
-  
+
     // Obtener todos los detalles de permisos para el usuario específico
     const detallePermisos = await this.detallePermisoRepository.find({
       where: { usuario: { id } },
       relations: ['usuario', 'sub_modulo', 'sub_modulo.modulos'],
     });
-  
+
     // Verificar si no se encontraron permisos para el usuario
     if (detallePermisos.length === 0) {
-      throw new NotFoundException('No se encontraron permisos para este usuario.');
+      throw new NotFoundException(
+        'No se encontraron permisos para este usuario.',
+      );
     }
-  
+
     // Agrupar datos por módulo
     const modulos = new Map<number, any>();
-  
+
     detallePermisos.forEach((detalle) => {
       const { sub_modulo } = detalle;
-  
+
       // Agrupar módulos y sub-módulos
       const moduloId = sub_modulo.modulos.id;
       if (!modulos.has(moduloId)) {
@@ -240,7 +241,7 @@ export class DetallepermisosService {
           sub_modulos: [],
         });
       }
-  
+
       const modulo = modulos.get(moduloId);
       modulo.sub_modulos.push({
         id: sub_modulo.id,
@@ -253,13 +254,17 @@ export class DetallepermisosService {
         ],
       });
     });
-  
+
     // Ordenar módulos por id en forma descendente
-    const sortedModulos = Array.from(modulos.values()).sort((a, b) => b.id - a.id);
-  
+    const sortedModulos = Array.from(modulos.values()).sort(
+      (a, b) => b.id - a.id,
+    );
+
     // Filtrar los módulos habilitados
-    const modulosHabilitados = sortedModulos.filter((modulo) => modulo.habilitado === true);
-  
+    const modulosHabilitados = sortedModulos.filter(
+      (modulo) => modulo.habilitado === true,
+    );
+
     // Estructurar los datos finales como un arreglo
     const resultado = [
       {
@@ -277,16 +282,11 @@ export class DetallepermisosService {
           },
         ],
         modulos_para_actualizar: modulosHabilitados, // Solo módulos habilitados con submódulos
-      }
+      },
     ];
-  
+
     return resultado;
   }
-  
-  
-
-
-
 
   async update(
     id: number,
@@ -341,22 +341,20 @@ export class DetallepermisosService {
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado.');
     }
-
-    for (const updateDetallepermisoDto of updateDetallepermisoDtos) {
-      const { id: moduloId, permisos } = updateDetallepermisoDto;
-
-      // Obtener todos los detalles de permisos para el módulo específico del usuario
+  
+    for (const { id: subModuloId, permisos } of updateDetallepermisoDtos) {
+      // Obtener todos los detalles de permisos para el submódulo específico del usuario
       const detallePermisos = await this.detallePermisoRepository.find({
-        where: { usuario: { id }, sub_modulo: { modulos: { id: moduloId } } },
+        where: { usuario: { id }, sub_modulo: { id: subModuloId } },
         relations: ['sub_modulo'],
       });
-
+  
       if (detallePermisos.length === 0) {
         throw new NotFoundException(
-          `No se encontraron permisos para el módulo con id ${moduloId} para este usuario.`,
+          `No se encontraron permisos para el submódulo con id ${subModuloId} para este usuario.`,
         );
       }
-
+  
       for (const detalle of detallePermisos) {
         // Actualizar permisos según el valor recibido
         detalle.create =
@@ -366,13 +364,14 @@ export class DetallepermisosService {
           permisos.find((p) => p.type === 'update')?.value ?? false;
         detalle.delete =
           permisos.find((p) => p.type === 'delete')?.value ?? false;
-
+  
         await this.detallePermisoRepository.save(detalle);
       }
     }
-
+  
     return { message: 'Permisos actualizados correctamente' };
   }
+  
 
   remove(id: number) {
     return `This action removes a #${id} detallepermiso`;

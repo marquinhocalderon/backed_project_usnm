@@ -57,6 +57,9 @@ export class DetallepermisosController {
   @UseInterceptors(FileInterceptor('')) // Interceptor para procesar form-data
   @Permission('update-detallepermisos')
   updatePeticiones(@Param('id_usuario') id: string, @Body() updatePeticiones: UpdatePeticiones[]) {
+
+    console.log(updatePeticiones);
+
     return this.detallepermisosService.updatePeticiones(+id, updatePeticiones);
   }
   

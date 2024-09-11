@@ -86,7 +86,8 @@ export class UsuariosController {
   @ApiBody({ type: [UpdateUsuarioDto] })
   @Permission('update-usuarios')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
+  @UseInterceptors(FileInterceptor('')) // Interceptor para procesar form-data
+  update(@Param('id') id: string, @Body() updateUsuarioDto: any) {
     return this.usuariosService.update(+id, updateUsuarioDto);
   }
 

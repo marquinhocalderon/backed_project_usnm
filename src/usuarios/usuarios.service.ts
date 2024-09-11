@@ -118,7 +118,7 @@ export class UsuariosService {
     return usuarioEncontrado;
   }
 
-  async update(id: number, updateUsuarioDto: UpdateUsuarioDto) {
+  async update(id: number, updateUsuarioDto: any) {
     // Buscar el usuario existente
     const usuarioExistente = await this.usuarioRepository.findOneBy({ id });
 
@@ -150,6 +150,7 @@ export class UsuariosService {
     // Preparar los datos de actualización
     const datosActualizacion: any = {
         username: updateUsuarioDto.username || usuarioExistente.username, // Mantener el nombre de usuario actual si no se proporciona uno nuevo
+        nombre_completo: updateUsuarioDto.nombre_completo || usuarioExistente.nombre_completo, // Mantener el nombre completo actual si no se proporciona uno nuevo
         perfiles: perfilEncontrado, // Actualizar la relación con el nuevo perfil
     };
 
@@ -163,6 +164,7 @@ export class UsuariosService {
 
     return { message: 'Usuario actualizado correctamente' };
 }
+
 
 
 

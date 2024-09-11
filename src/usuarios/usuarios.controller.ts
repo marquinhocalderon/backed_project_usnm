@@ -84,6 +84,7 @@ export class UsuariosController {
   // }
 
   @ApiBody({ type: [UpdateUsuarioDto] })
+  @Permission('update-usuarios')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUsuarioDto: UpdateUsuarioDto) {
     return this.usuariosService.update(+id, updateUsuarioDto);

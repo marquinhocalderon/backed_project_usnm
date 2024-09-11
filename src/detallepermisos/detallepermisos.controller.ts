@@ -34,6 +34,14 @@ export class DetallepermisosController {
     return this.detallepermisosService.findOne(+id);
   }
 
+
+  @ApiTags('Usuarios')
+  @Get('usuariospermisos/:id_usuario')
+  @Permission('read-usuarios')
+  findOne2(@Param('id_usuario') id: string) {
+    return this.detallepermisosService.findOne2(+id);
+  }
+
   @ApiTags('DetallePermisos')
   @ApiBody({ type: [UpdateDetallepermisoDto] })
   @Patch('modulospermisos/:id_usuario')

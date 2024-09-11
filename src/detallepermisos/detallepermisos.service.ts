@@ -201,6 +201,89 @@ export class DetallepermisosService {
     return resultado;
   }
   
+  
+  async findOne2(id: number): Promise<any[]> {
+    // Verificar si el usuario existe
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id },
+      relations: ['perfiles'], // Asegúrate de incluir las relaciones necesarias
+    });
+  
+    if (!usuario) {
+      throw new NotFoundException('Usuario no encontrado.');
+    }
+  
+    // Obtener todos los detalles de permisos para el usuario específico
+    const detallePermisos = await this.detallePermisoRepository.find({
+      where: { usuario: { id } },
+      relations: ['usuario', 'sub_modulo', 'sub_modulo.modulos'],
+    });
+  
+    // Verificar si no se encontraron permisos para el usuario
+    if (detallePermisos.length === 0) {
+      throw new NotFoundException('No se encontraron permisos para este usuario.');
+    }
+  
+    // Agrupar datos por módulo
+    const modulos = new Map<number, any>();
+  
+    detallePermisos.forEach((detalle) => {
+      const { sub_modulo } = detalle;
+  
+      // Agrupar módulos y sub-módulos
+      const moduloId = sub_modulo.modulos.id;
+      if (!modulos.has(moduloId)) {
+        modulos.set(moduloId, {
+          id: moduloId,
+          nombre_modulo: sub_modulo.modulos.nombre_modulo,
+          habilitado: detalle.habilitado,
+          sub_modulos: [],
+        });
+      }
+  
+      const modulo = modulos.get(moduloId);
+      modulo.sub_modulos.push({
+        id: sub_modulo.id,
+        nombre_submodulo: sub_modulo.nombre_submodulo,
+        permisos: [
+          { type: 'create', value: detalle.create },
+          { type: 'read', value: detalle.read },
+          { type: 'update', value: detalle.update },
+          { type: 'delete', value: detalle.delete },
+        ],
+      });
+    });
+  
+    // Ordenar módulos por id en forma descendente
+    const sortedModulos = Array.from(modulos.values()).sort((a, b) => b.id - a.id);
+  
+    // Filtrar los módulos habilitados
+    const modulosHabilitados = sortedModulos.filter((modulo) => modulo.habilitado === true);
+  
+    // Estructurar los datos finales como un arreglo
+    const resultado = [
+      {
+        usuario: [
+          {
+            id: usuario.id,
+            username: usuario.username,
+            nombre_completo: usuario.nombre_completo,
+            estado: usuario.estado,
+            perfil: {
+              id: usuario.perfiles.id,
+              nombre_perfil: usuario.perfiles.nombre_perfil,
+              estado: usuario.perfiles.estado,
+            },
+          },
+        ],
+        modulos_para_actualizar: modulosHabilitados, // Solo módulos habilitados con submódulos
+      }
+    ];
+  
+    return resultado;
+  }
+  
+  
 
 
 

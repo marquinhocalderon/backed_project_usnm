@@ -123,39 +123,47 @@ export class UsuariosService {
     const usuarioExistente = await this.usuarioRepository.findOneBy({ id });
 
     if (!usuarioExistente) {
-      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+        throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
 
     // Verificar si el nuevo perfil existe y está activo
     const perfilEncontrado = await this.perfilRepository.findOneBy({
-      id: parseInt(updateUsuarioDto.id_perfil, 10),
-      estado: true,
+        id: parseInt(updateUsuarioDto.id_perfil, 10),
+        estado: true,
     });
 
     if (!perfilEncontrado) {
-      throw new HttpException('Perfil no encontrado o inactivo', HttpStatus.NOT_FOUND);
+        throw new HttpException('Perfil no encontrado o inactivo', HttpStatus.NOT_FOUND);
     }
 
     // Verificar si el nombre de usuario es diferente y si ya existe otro usuario con el mismo nombre
     if (updateUsuarioDto.username && updateUsuarioDto.username !== usuarioExistente.username) {
-      const usuarioEncontrado = await this.usuarioRepository.findOneBy({
-        username: updateUsuarioDto.username,
-      });
+        const usuarioEncontrado = await this.usuarioRepository.findOneBy({
+            username: updateUsuarioDto.username,
+        });
 
-      if (usuarioEncontrado) {
-        throw new HttpException('El nombre de usuario ya existe', HttpStatus.CONFLICT);
-      }
+        if (usuarioEncontrado) {
+            throw new HttpException('El nombre de usuario ya existe', HttpStatus.CONFLICT);
+        }
+    }
+
+    // Preparar los datos de actualización
+    const datosActualizacion: any = {
+        username: updateUsuarioDto.username || usuarioExistente.username, // Mantener el nombre de usuario actual si no se proporciona uno nuevo
+        perfiles: perfilEncontrado, // Actualizar la relación con el nuevo perfil
+    };
+
+    // Solo actualizar la contraseña si se proporciona una nueva
+    if (updateUsuarioDto.password) {
+        datosActualizacion.password = await bcryptjs.hash(updateUsuarioDto.password, 10);
     }
 
     // Actualizar el usuario
-    await this.usuarioRepository.update(id, {
-      username: updateUsuarioDto.username , // Mantener el nombre de usuario actual si no se proporciona uno nuevo
-      password: await bcryptjs.hash(updateUsuarioDto.password, 10) , // Mantener la contraseña actual si no se proporciona una nueva
-      perfiles: perfilEncontrado , // Actualizar la relación con el nuevo perfil
-    });
+    await this.usuarioRepository.update(id, datosActualizacion);
 
     return { message: 'Usuario actualizado correctamente' };
-  }
+}
+
 
 
   async remove(id: number) {

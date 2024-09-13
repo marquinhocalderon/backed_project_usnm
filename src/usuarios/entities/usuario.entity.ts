@@ -30,6 +30,8 @@ export class Usuario {
         // cascade: true,
         eager: true, // para que traiga todos los datos de la columna relacionada
       })
+
+      // nombre de la tabla como se llamara la relacion del campo
     @JoinColumn({name: "id_perfil"})
     perfiles: Perfile
 

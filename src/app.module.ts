@@ -9,6 +9,9 @@ import { MostrararchivosModule } from './mostrararchivos/mostrararchivos.module'
 import { AuthModule } from './auth/auth.module';
 import { ModulosModule } from './modulos/modulos.module';
 import { SubmodulosModule } from './submodulos/submodulos.module';
+import { FacultadesModule } from './facultades/facultades.module';
+import { GabinetesModule } from './gabinetes/gabinetes.module';
+import { BackupsModule } from './backups/backups.module';
 
 
 
@@ -48,6 +51,12 @@ import { SubmodulosModule } from './submodulos/submodulos.module';
   ModulosModule,
 
   SubmodulosModule,
+
+  FacultadesModule,
+
+  GabinetesModule,
+
+  BackupsModule,
 
 
 

@@ -14,14 +14,19 @@ export class Gabinentes {
     nombre_gabinete: string;
 
 
-    @Column()
+    @Column('text')
     descripcion_referencia: string;
+    
 
 
-    @Column()
-    imagen_url: string;
+    @Column({nullable: true})
+    imagen_url_1: string;
 
+    @Column({nullable: true})
+    imagen_url_2: string;
 
+    @Column({nullable: true})
+    imagen_url_3: string;
 
 
     @ManyToOne(() => Facultade, (facultad) => facultad.id, {

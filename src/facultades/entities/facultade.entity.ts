@@ -20,6 +20,9 @@ export class Facultade {
     @JoinColumn({name: "id_usuario"})
     usuarios: Usuario
 
+    @Column({ default: true })
+    estado: boolean;
+
 
 
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateGabineteDto } from './dto/create-gabinete.dto';
 import { UpdateGabineteDto } from './dto/update-gabinete.dto';
 import { Facultade } from 'src/facultades/entities/facultade.entity';
@@ -17,18 +17,65 @@ export class GabinetesService {
     @InjectRepository(Usuario) private usuarioRepositorio: Repository<Usuario>,
   ) {}
 
-  create(createGabineteDto: CreateGabineteDto, imagenes: any) {
+  async create(createGabineteDto: CreateGabineteDto, imagenes: any) {
     // Asigna las URLs de las imágenes al DTO
-    const imagen_url_1  = imagenes[0] ?? null;;
-    const imagen_url_2= imagenes[1] ?? null;;
-    const imagen_url_3 = imagenes[2] ?? null;;
+    const imagen_url_1 = imagenes[0] ?? null;
+    const imagen_url_2 = imagenes[1] ?? null;
+    const imagen_url_3 = imagenes[2] ?? null;
 
     console.log(imagen_url_1, imagen_url_2, imagen_url_3);
+  
+    const gabiniteEncontrado = await this.gabineteRepositorip.findOneBy({
+      nombre_gabinete: createGabineteDto.nombre_gabinete,
+    });
+  
+    if (gabiniteEncontrado) {
+      return {
+        success: false,
+        message: 'Este Gabinete Ya Existe',
+      };
+    }
+  
+    const usuarioEncontrado = await this.usuarioRepositorio.findOneBy({
+      id: parseInt(createGabineteDto.id_usuario, 10),
+    });
+  
+    if (usuarioEncontrado === null) {
+      return {
+        success: false,
+        message: 'Usuario No Existe',
+      };
+    }
+  
+    const facultadEncontrado = await this.facultadRepositorio.findOneBy({
+      id: parseInt(createGabineteDto.id_facultad, 10),
+    });
+  
+    if (facultadEncontrado === null) {
+      return {
+        success: false,
+        message: 'Facultad No Existe',
+      };
+    }
 
-
-
-    return 'This action adds a new gabinete';
+    const nuevodato = this.gabineteRepositorip.create({
+      nombre_gabinete: createGabineteDto.nombre_gabinete,
+      descripcion_referencia: createGabineteDto.descripcion,
+      imagen_url_1: imagen_url_1,
+      imagen_url_2: imagen_url_2,
+      imagen_url_3 : imagen_url_3,
+      usuarios: usuarioEncontrado,
+      facultades: facultadEncontrado,
+    });
+  
+    await this.gabineteRepositorip.save(nuevodato);
+  
+    return {
+      success: true,
+      message: 'Se registro Correctamente',
+    };
   }
+  
 
   findAll() {
     return `This action returns all gabinetes`;

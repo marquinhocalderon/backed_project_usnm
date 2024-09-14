@@ -8,11 +8,11 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('file')
 export class MostrararchivosController {
   constructor(private readonly mostrararchivosService: MostrararchivosService) {}
-  @Get('imagen/:filename_usuario')
-  getImagen(@Param('filename_usuario') filename: string, @Res() res: Response) {
+  @Get('imagen/:url_imagen')
+  getImagen(@Param('url_imagen') filename: string, @Res() res: Response) {
 
     // Construye la ruta completa del archivo usando el directorio actual de trabajo
-    const filePath = path.join(__dirname, '..', '..', 'uploads', 'usuarios', filename);
+    const filePath = path.join(__dirname, '..', '..', 'uploads', 'gabinetesimagenes', filename);
 
     // Verifica si el archivo existe
     if (fs.existsSync(filePath)) {

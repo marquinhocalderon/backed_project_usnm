@@ -47,6 +47,10 @@ export class Gabinentes {
     @JoinColumn({name: "id_usuario"})
     usuarios: Usuario
 
+    @Column({default: true})
+    estado: boolean;
+
+
 
 
 

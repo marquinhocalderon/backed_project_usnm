@@ -54,7 +54,7 @@ export class PerfilDto {
   @ApiProperty({ example: 5 })
   id: number;
 
-  @ApiProperty({ example: 'ADMIN' })
+  @ApiProperty()
   nombre_perfil: string;
 
   @ApiProperty({ example: true })
@@ -69,7 +69,7 @@ export class UsuarioDto {
   @ApiProperty({ example: 'FISI UNSM' })
   username: string;
 
-  @ApiProperty({ example: 'FISI UNSM' })
+  @ApiProperty()
   nombre_completo: string;
 
   @ApiProperty({ type: [PerfilDto] })
@@ -80,10 +80,10 @@ export class UsuarioDto2 {
   @ApiProperty({ example: 10 })
   id: number;
 
-  @ApiProperty({ example: 'FISI USNM' })
+  @ApiProperty()
   username: string;
 
-  @ApiProperty({ example: 'FISI USM' })
+  @ApiProperty()
   nombre_completo: string;
 
   estado: boolean;

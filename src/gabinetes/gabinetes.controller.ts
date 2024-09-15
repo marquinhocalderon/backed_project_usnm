@@ -2,16 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Upl
 import { GabinetesService } from './gabinetes.service';
 import { CreateGabineteDto } from './dto/create-gabinete.dto';
 import { UpdateGabineteDto } from './dto/update-gabinete.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { nombreComoSeGuarda, validarTipodeArchivoGuardar } from 'src/usuarios/helpers/imagenes.helpers';
 import * as fs from 'fs';
 import * as path from 'path';
+import { GabineteDto } from './dto/get-gabinete.dto';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 const MAX_SIZE_MB = 1;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+@ApiTags('Gabinetes')
 @Controller('gabinetes')
 export class GabinetesController {
   constructor(private readonly gabinetesService: GabinetesService) {}
@@ -92,11 +94,14 @@ async create(@UploadedFiles() imagenes: Express.Multer.File[], @Body() createGab
 
 
 
+
+  @ApiBody({ type: [GabineteDto] })
   @Get()
   findAll() {
     return this.gabinetesService.findAll();
   }
 
+  @ApiBody({ type: [GabineteDto] })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gabinetesService.findOne(+id);

@@ -6,6 +6,7 @@ import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Gabinentes } from './entities/gabinete.entity';
+import { GabineteDto } from './dto/get-gabinete.dto';
 
 @Injectable()
 export class GabinetesService {
@@ -75,64 +76,84 @@ export class GabinetesService {
       message: 'Se registro Correctamente',
     };
   }
-  async findAll() {
-    const datos = await this.gabineteRepositorip.find({
-      order: { id: 'DESC' },
-      relations: ['facultades', 'usuarios', 'usuarios.perfiles'], // Asegúrate de incluir las relaciones necesarias
-    });
-  
-    // Transformar los datos para incluir las imágenes en un arreglo de objetos
-    const datosTransformados = datos.map(dato => ({
-      id: dato.id,
-      nombre_gabinete: dato.nombre_gabinete,
-      imagenes: [
-        { imagen: dato.imagen_url_1 },
-        { imagen: dato.imagen_url_2 },
-        { imagen: dato.imagen_url_3 },
-      ].filter(obj => obj.imagen !== null), // Filtrar los valores nulos
-      descripcion_referencia: dato.descripcion_referencia,
-      estado: dato.estado,
-      facultades: dato.facultades,
-      usuarios: dato.usuarios,
-    }));
-  
-    return datosTransformados;
-  }
-  
-  
-  
-  
+ 
 
-  async findOne(id: number): Promise<any[]> {
-    const encontrado = await this.gabineteRepositorip.findOne({
-      where: { id: id, estado: true },
-      relations: ['facultades', 'usuarios', 'usuarios.perfiles'], // Asegúrate de incluir las relaciones necesarias
+  async findAll(): Promise<GabineteDto[]> {
+    const gabinetes = await this.gabineteRepositorip.find({
+      where: { estado: true }
     });
-  
-    if (!encontrado) {
-      throw new HttpException('Dato no encontrado', HttpStatus.NOT_FOUND);
-    }
-  
-    if (!encontrado.estado) {
-      throw new HttpException('Dato Eliminado', HttpStatus.NOT_FOUND);
-    }
-  
-    // Transformar los datos para incluir las imágenes en un arreglo y eliminar las propiedades individuales
-    const datosTransformados = {
-      id: encontrado.id,
-      nombre_gabinete: encontrado.nombre_gabinete,
-      imagenes: [
-        { imagen: encontrado.imagen_url_1 },
-        { imagen: encontrado.imagen_url_2 },
-        { imagen: encontrado.imagen_url_3 },
-      ].filter(obj => obj.imagen !== null), // Filtrar los valores nulos
-      descripcion_referencia: encontrado.descripcion_referencia,
-      estado: encontrado.estado,
-      facultades: encontrado.facultades,
-      usuarios: encontrado.usuarios,
+    return gabinetes.map(gabinete => this.construirElJson(gabinete));
+  }
+
+  private construirElJson(gabinete: Gabinentes): GabineteDto {
+    return {
+      id: gabinete.id,
+      nombre_gabinete: gabinete.nombre_gabinete,
+      imagenes: [{
+        imagen: gabinete.imagen_url_1,
+      }, {
+        imagen: gabinete.imagen_url_2,
+      }, {
+        imagen: gabinete.imagen_url_3,
+      }],
+      descripcion_referencia: gabinete.descripcion_referencia,
+      estado: gabinete.estado,
+      facultades: {
+        id: gabinete.facultades.id,
+        facultad: gabinete.facultades.facultad,
+        estado: gabinete.facultades.estado
+      },
+      usuario: {
+        id: gabinete.usuarios.id,
+        username: gabinete.usuarios.username,
+        nombre_completo: gabinete.usuarios.nombre_completo,
+        estado: gabinete.usuarios.estado,
+        perfiles: {
+          id: gabinete.usuarios.perfiles.id,
+          nombre_perfil: gabinete.usuarios.perfiles.nombre_perfil,
+          estado: gabinete.usuarios.perfiles.estado,
+        },
+      },
     };
-  
-    return [datosTransformados]; // Devolver un arreglo con el objeto transformado
+  }
+
+  async findOne(id: number): Promise<GabineteDto[]> {
+    const gabinetes = await this.gabineteRepositorip.find({
+      where: { id: id, estado: true },
+    });
+    return gabinetes.map(gabinete => this.construirElJsonbyId(gabinete));
+  }
+
+  private construirElJsonbyId(gabinete: Gabinentes): GabineteDto {
+    return {
+      id: gabinete.id,
+      nombre_gabinete: gabinete.nombre_gabinete,
+      imagenes: [{
+        imagen: gabinete.imagen_url_1,
+      }, {
+        imagen: gabinete.imagen_url_2,
+      }, {
+        imagen: gabinete.imagen_url_3,
+      }],
+      descripcion_referencia: gabinete.descripcion_referencia,
+      estado: gabinete.estado,
+      facultades: {
+        id: gabinete.facultades.id,
+        facultad: gabinete.facultades.facultad,
+        estado: gabinete.facultades.estado
+      },
+      usuario: {
+        id: gabinete.usuarios.id,
+        username: gabinete.usuarios.username,
+        nombre_completo: gabinete.usuarios.nombre_completo,
+        estado: gabinete.usuarios.estado,
+        perfiles: {
+          id: gabinete.usuarios.perfiles.id,
+          nombre_perfil: gabinete.usuarios.perfiles.nombre_perfil,
+          estado: gabinete.usuarios.perfiles.estado,
+        },
+      },
+    };
   }
   
   

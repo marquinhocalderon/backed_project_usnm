@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { GabinetesService } from './gabinetes.service';
 import { CreateGabineteDto } from './dto/create-gabinete.dto';
 import { UpdateGabineteDto } from './dto/update-gabinete.dto';
@@ -9,10 +9,14 @@ import { nombreComoSeGuarda, validarTipodeArchivoGuardar } from 'src/usuarios/he
 import * as fs from 'fs';
 import * as path from 'path';
 import { GabineteDto } from './dto/get-gabinete.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Permission } from 'src/auth/decorators/permission.decorator';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 const MAX_SIZE_MB = 1;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+@UseGuards(AuthGuard)
 @ApiTags('Gabinetes')
 @Controller('gabinetes')
 export class GabinetesController {
@@ -20,6 +24,7 @@ export class GabinetesController {
 
 
   @Post()
+  @Permission('create-gabinetes')
 @UseInterceptors(FilesInterceptor('imagenes', 10, { 
   storage: diskStorage({
     destination: (req, file, cb) => {
@@ -97,22 +102,26 @@ async create(@UploadedFiles() imagenes: Express.Multer.File[], @Body() createGab
 
   @ApiBody({ type: [GabineteDto] })
   @Get()
+  @Permission('read-gabinetes')
   findAll() {
     return this.gabinetesService.findAll();
   }
 
   @ApiBody({ type: [GabineteDto] })
   @Get(':id')
+  @Permission('read-gabinetes')
   findOne(@Param('id') id: string) {
     return this.gabinetesService.findOne(+id);
   }
 
   @Patch(':id')
+  @Permission('update-gabinetes')
   update(@Param('id') id: string, @Body() updateGabineteDto: UpdateGabineteDto) {
     return this.gabinetesService.update(+id, updateGabineteDto);
   }
 
   @Delete(':id')
+  @Permission('delete-gabinetes')
   remove(@Param('id') id: string) {
     return this.gabinetesService.remove(+id);
   }

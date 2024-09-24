@@ -13,7 +13,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Permission } from 'src/auth/decorators/permission.decorator';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
-const MAX_SIZE_MB = 1;
+const MAX_SIZE_MB = 10;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 @UseGuards(AuthGuard)
@@ -38,7 +38,7 @@ export class GabinetesController {
   }),
   fileFilter: (req, file, cb) => {
     if (file.size > MAX_SIZE_BYTES) {
-      return cb(new BadRequestException(`El tamaño de la imagen ${file.originalname} es demasiado grande. Por favor, proporciona una imagen de menos de 1 MB.`), false);
+      return cb(new BadRequestException(`El tamaño de la imagen ${file.originalname} es demasiado grande. Por favor, proporciona una imagen de menos de 10 MB.`), false);
     }
 
     if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {

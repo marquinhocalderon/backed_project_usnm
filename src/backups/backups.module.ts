@@ -4,11 +4,12 @@ import { BackupsController } from './backups.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Gabinentes } from 'src/gabinetes/entities/gabinete.entity';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
-import { Facultade } from 'src/facultades/entities/facultade.entity';
 import { Backups } from './entities/backup.entity';
+import { DetallepermisosModule } from 'src/detallepermisos/detallepermisos.module';
+
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Backups, Gabinentes, Usuario, Facultade])],
+  imports : [TypeOrmModule.forFeature([Backups, Gabinentes, Usuario]), DetallepermisosModule],
   controllers: [BackupsController],
   providers: [BackupsService],
 })

@@ -8,15 +8,22 @@ import * as path from 'path';
 import { BackupsService } from './backups.service';
 import { UpdateBackupDto } from './dto/update-backup.dto';
 import { CreateBackupDto } from './dto/create-backup.dto';
+import { BackupDto } from './dto/get-backup.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Permission } from 'src/auth/decorators/permission.decorator';
+
+
 const ALLOWED_MIME_TYPES = ['text/plain']; // Solo texto plano
 const MAX_SIZE_MB = 10;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
+@UseGuards(AuthGuard)
+@ApiTags('Backups')
 @Controller('backups')
 export class BackupsController {
   constructor(private readonly backupsService: BackupsService) {}
 
   @Post()
+  @Permission('create-backups')
   @UseInterceptors(FilesInterceptor('archivos', 3, {
     storage: diskStorage({
       destination: (req, file, cb) => {
@@ -100,11 +107,15 @@ export class BackupsController {
   }
   
   @Get()
+  @Permission('read-backups')
+  @ApiBody({ type: [BackupDto] })
   findAll() {
     return this.backupsService.findAll();
   }
 
   @Get(':id')
+  @ApiBody({ type: [BackupDto] })
+  @Permission('read-backups')
   findOne(@Param('id') id: string) {
     return this.backupsService.findOne(+id);
   }

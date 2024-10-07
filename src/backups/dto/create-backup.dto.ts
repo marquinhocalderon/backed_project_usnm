@@ -16,3 +16,24 @@ export class CreateBackupDto {
     @MinLength(1, { message: 'El campo id_gabinete debe 1 caracteres como minimo' })
     id_gabinete: string
 }
+
+
+export class FileDocumentoTxt {
+    @ApiProperty({
+        description: 'File del FormData',
+        example: 'File del Formdata los Binarios , Todo debe ser en formdata el envio de datos',
+    })
+    File: string;
+}
+
+export class SweaggerCreateBackupDto {
+    @ApiProperty()
+    id_usuario: string
+
+    @ApiProperty()
+    id_gabinete: string
+    
+    @ApiProperty({ type: [FileDocumentoTxt] })
+    archivos: FileDocumentoTxt[];
+}
+

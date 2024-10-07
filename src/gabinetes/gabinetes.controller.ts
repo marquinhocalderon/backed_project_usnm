@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, UploadedFiles, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { GabinetesService } from './gabinetes.service';
-import { CreateGabineteDto } from './dto/create-gabinete.dto';
+import { CreateGabineteDto, SweaggerCreategABINITEDto } from './dto/create-gabinete.dto';
 import { UpdateGabineteDto } from './dto/update-gabinete.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -11,6 +11,7 @@ import * as path from 'path';
 import { GabineteDto } from './dto/get-gabinete.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Permission } from 'src/auth/decorators/permission.decorator';
+import { SweaggerCreateBackupDto } from 'src/backups/dto/create-backup.dto';
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 const MAX_SIZE_MB = 10;
@@ -22,7 +23,7 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 export class GabinetesController {
   constructor(private readonly gabinetesService: GabinetesService) {}
 
-
+  @ApiBody({ type: SweaggerCreategABINITEDto })
   @Post()
   @Permission('create-gabinetes')
 @UseInterceptors(FilesInterceptor('imagenes', 10, { 

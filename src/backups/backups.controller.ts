@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { BackupsService } from './backups.service';
 import { UpdateBackupDto } from './dto/update-backup.dto';
-import { CreateBackupDto } from './dto/create-backup.dto';
+import { CreateBackupDto, SweaggerCreateBackupDto } from './dto/create-backup.dto';
 import { BackupDto } from './dto/get-backup.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { Permission } from 'src/auth/decorators/permission.decorator';
@@ -21,7 +21,7 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 @Controller('backups')
 export class BackupsController {
   constructor(private readonly backupsService: BackupsService) {}
-
+  @ApiBody({ type: SweaggerCreateBackupDto })
   @Post()
   @Permission('create-backups')
   @UseInterceptors(FilesInterceptor('archivos', 3, {

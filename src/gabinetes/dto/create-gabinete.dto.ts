@@ -35,3 +35,26 @@ export class CreateGabineteDto {
     @MinLength(1, { message: 'El campo id_facultad debe 1 caracteres como minimo' })
     id_facultad: string
 }
+
+
+export class Imagenes {
+    @ApiProperty({
+        description: 'File del FormData',
+        example: 'File del Formdata los Binarios , Todo debe ser en formdata el envio de datos',
+    })
+    File: string;
+}
+
+export class SweaggerCreategABINITEDto {
+    @ApiProperty()
+    id_usuario: string
+
+    @ApiProperty()
+    id_facultad: string
+
+    @ApiProperty()
+    descripcion: string
+    
+    @ApiProperty({ type: [Imagenes] })
+    imagenes: Imagenes[];
+}

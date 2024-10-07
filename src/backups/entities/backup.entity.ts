@@ -8,13 +8,13 @@ export class Backups {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: true})
     backup1: string;
     
-    @Column()
+    @Column({nullable: true})
     backup2: string;
 
-    @Column()
+    @Column({nullable: true})
     backup3: string;
 
     

@@ -17,7 +17,7 @@ export class UpdateGabineteDto {
     @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value)) // Trim whitespaces at the beginning and end
     @IsNotEmpty({ message: 'El campo nombre_gabinete no debe estar vacío' })
     @IsString({ message: 'El campo nombre_gabinete tiene que ser una cadena de caracteres' })
-    @MaxLength(16, { message: 'El campo nombre_gabinete debe 16 caracteres como maximo' })
+    @MaxLength(32, { message: 'El campo nombre_gabinete debe 32 caracteres como maximo' })
     @MinLength(2, { message: 'El campo nombre_gabinete debe 2 caracteres como minimo' })
     nombre_gabinete: string;
 

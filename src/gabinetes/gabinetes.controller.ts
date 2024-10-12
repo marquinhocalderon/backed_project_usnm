@@ -143,7 +143,7 @@ async create(@UploadedFiles() imagenes: Express.Multer.File[], @Body() createGab
   }))
   async update(
     @UploadedFiles() imagenes: Express.Multer.File[] = [], // Las imágenes son opcionales
-    @Body() updateGabinete: UpdateGabineteDto // Asegúrate de que UpdateGabineteDto esté importado y definido correctamente
+    @Body() updateGabinete: UpdateGabineteDto // Asegúrate de que UpdateGabineteDto esté importado y definido correctamente2
   ) {
     // Procesar la lógica del servicio, siempre pasando el arreglo de imágenes
     const resultado = await this.gabinetesService.update(updateGabinete, imagenes); // Pasar el arreglo de imágenes (vacío o lleno)

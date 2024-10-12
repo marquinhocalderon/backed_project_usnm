@@ -33,6 +33,7 @@ export class FacultadesController {
   @Permission('update-facultades')
   @UseInterceptors(FileInterceptor('')) // Interceptor para procesar form-data
   update(@Param('id') id: string, @Body() updateFacultadeDto: UpdateFacultadeDto) {
+    console.log(updateFacultadeDto);  
     return this.facultadesService.update(+id, updateFacultadeDto);
   }
 

@@ -96,8 +96,25 @@ export class FacultadesService {
         );
       }
     }
-    // Actualizar 
-    await this.facultadRepositorio.update(id, updateFacultadeDto);
+
+    const usuarioExistente = await this.usuarioRepositorio.findOneBy({
+      id: Number(updateFacultadeDto.id_usuario),
+    });
+
+    if (!usuarioExistente) {
+      throw new HttpException('Dato no existe', HttpStatus.NOT_FOUND);
+    }
+
+
+    // Crear un nuevo usuario con la información proporcionada y el nombre del archivo
+    const nuevodato = this.facultadRepositorio.create({
+      facultad: updateFacultadeDto.facultad,
+      usuarios: usuarioExistente,
+  });
+
+  await this.facultadRepositorio.update(id, nuevodato);
+
+
 
     return { message: 'Se actualizó correctamente' };
 }

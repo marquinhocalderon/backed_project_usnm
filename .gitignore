@@ -5,6 +5,7 @@
 
 # Ignorar la carpeta uploads y todo su contenido
 /uploads
+/temp
 
 # Logs
 logs

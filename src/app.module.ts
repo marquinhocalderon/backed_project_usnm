@@ -12,6 +12,7 @@ import { SubmodulosModule } from './submodulos/submodulos.module';
 import { FacultadesModule } from './facultades/facultades.module';
 import { GabinetesModule } from './gabinetes/gabinetes.module';
 import { BackupsModule } from './backups/backups.module';
+import { DetallebackupsModule } from './detallebackups/detallebackups.module';
 
 
 
@@ -57,6 +58,8 @@ import { BackupsModule } from './backups/backups.module';
   GabinetesModule,
 
   BackupsModule,
+
+  DetallebackupsModule,
 
 
 

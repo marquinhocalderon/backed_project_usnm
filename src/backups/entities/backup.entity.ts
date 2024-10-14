@@ -8,16 +8,6 @@ export class Backups {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({nullable: true})
-    backup1: string;
-    
-    @Column({nullable: true})
-    backup2: string;
-
-    @Column({nullable: true})
-    backup3: string;
-
-    
     @ManyToOne(() => Gabinentes, (gabinetes) => gabinetes.id, {
         // cascade: true,
         eager: true, // para que traiga todos los datos de la columna relacionada
@@ -33,6 +23,9 @@ export class Backups {
     //   Nombre de la relacio de la tabla
     @JoinColumn({name: "id_usuario"})
     usuarios: Usuario
+
+    @Column({nullable: true })
+    estado: boolean;
 
 
 

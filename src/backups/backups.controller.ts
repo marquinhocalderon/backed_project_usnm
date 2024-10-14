@@ -24,7 +24,7 @@ export class BackupsController {
   @ApiBody({ type: SweaggerCreateBackupDto })
   @Post()
   @Permission('create-backups')
-  @UseInterceptors(FilesInterceptor('archivos', 3, {
+  @UseInterceptors(FilesInterceptor('archivos', 10, {
     storage: diskStorage({
       destination: (req, file, cb) => {
         const tempPath = './temp/uploads/backups';

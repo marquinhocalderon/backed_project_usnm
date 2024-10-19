@@ -28,4 +28,31 @@ export class MostrararchivosController {
       throw new HttpException('Imagen no encontrada', HttpStatus.NOT_FOUND);
     }
   }
+
+  @Get('txt/:filename')
+  getTxtFile(@Param('filename') filename: string, @Res() res: Response) {
+    console.log(filename);
+    const filePath = path.join(__dirname, '..', '..', 'uploads', 'backups', filename); // No es necesario agregar `.txt` aquí
+  
+    console.log(filePath);
+  
+    if (fs.existsSync(filePath)) {
+      // Establecer encabezados para indicar que es un archivo descargable
+      res.set({
+        'Content-Type': 'text/plain',
+        'Content-Disposition': `attachment; filename="${filename}"`, // Establecer el nombre del archivo para la descarga
+      });
+  
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          console.error('Error al enviar el archivo:', err);
+          throw new HttpException('Error al enviar el archivo', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      });
+    } else {
+      throw new HttpException('Archivo no encontrado', HttpStatus.NOT_FOUND);
+    }
+  }
+  
+
 }

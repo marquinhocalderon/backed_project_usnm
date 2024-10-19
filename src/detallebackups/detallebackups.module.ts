@@ -12,5 +12,6 @@ import { Gabinentes } from 'src/gabinetes/entities/gabinete.entity';
   imports : [TypeOrmModule.forFeature([Backups, DetalleBackups,  Gabinentes, Usuario]), DetallepermisosModule],
   controllers: [DetallebackupsController],
   providers: [DetallebackupsService],
+  exports: [DetallebackupsService]
 })
 export class DetallebackupsModule {}

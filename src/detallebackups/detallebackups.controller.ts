@@ -7,10 +7,7 @@ import { UpdateDetallebackupDto } from './dto/update-detallebackup.dto';
 export class DetallebackupsController {
   constructor(private readonly detallebackupsService: DetallebackupsService) {}
 
-  @Post()
-  create(@Body() createDetallebackupDto: CreateDetallebackupDto) {
-    return this.detallebackupsService.create(createDetallebackupDto);
-  }
+
 
   @Get()
   findAll() {

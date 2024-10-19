@@ -6,10 +6,16 @@ import { Gabinentes } from 'src/gabinetes/entities/gabinete.entity';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { Backups } from './entities/backup.entity';
 import { DetallepermisosModule } from 'src/detallepermisos/detallepermisos.module';
+import { DetallebackupsModule } from 'src/detallebackups/detallebackups.module';
+
 
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Backups, Gabinentes, Usuario]), DetallepermisosModule],
+  imports: [
+    TypeOrmModule.forFeature([Backups, Gabinentes, Usuario]), 
+    DetallepermisosModule, 
+    DetallebackupsModule, // Cambiado aquí
+  ],
   controllers: [BackupsController],
   providers: [BackupsService],
 })

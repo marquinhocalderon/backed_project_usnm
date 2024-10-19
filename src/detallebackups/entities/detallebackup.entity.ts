@@ -14,8 +14,8 @@ export class DetalleBackups {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
-  fecha: String;
+  @Column('timestamp')
+  fecha: Date;
 
   @Column({ nullable: true, type: 'json' })
   backups_json: string;

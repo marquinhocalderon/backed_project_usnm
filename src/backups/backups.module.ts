@@ -7,12 +7,13 @@ import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { Backups } from './entities/backup.entity';
 import { DetallepermisosModule } from 'src/detallepermisos/detallepermisos.module';
 import { DetallebackupsModule } from 'src/detallebackups/detallebackups.module';
+import { DetalleBackups } from 'src/detallebackups/entities/detallebackup.entity';
 
 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Backups, Gabinentes, Usuario]), 
+    TypeOrmModule.forFeature([Backups, Gabinentes, Usuario, DetalleBackups]), 
     DetallepermisosModule, 
     DetallebackupsModule, // Cambiado aquí
   ],

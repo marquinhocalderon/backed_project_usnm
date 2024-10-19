@@ -59,9 +59,43 @@ export class BackupsService {
     return this.detallebackups.create(respuesta.id_backup, documentos, createBackupDto);
   }
   
-  findAll() {
-    return `This action returns all backups`;
+  async findAll(): Promise<any[]> {
+    const backups = await this.backupsRepositorio.find({
+      relations: ['detallebackups', 'detallebackups.gabinetes', 'detallebackups.usuarios', 'detallebackups.usuarios.perfiles', 'detallebackups.gabinetes.facultades'], // Incluir las relaciones necesarias
+    });
+  
+    return backups.map((backup) => ({
+      id_backup: backup.id,
+      estado: backup.estado,
+      historial_subidos: backup.detallebackups.map((detalle) => ({
+        id: detalle.id,
+        documentos: detalle.backups_json,
+        gabinetes: {
+          id: detalle.gabinetes.id,
+          nombre: detalle.gabinetes.nombre_gabinete,
+          imagenes: [
+            { imagen: detalle.gabinetes.imagen_url_1 },
+            { imagen: detalle.gabinetes.imagen_url_2 },
+            { imagen: detalle.gabinetes.imagen_url_3 },
+          ],
+          facultad: {
+            id: detalle.gabinetes.facultades.id,
+            nombre: detalle.gabinetes.facultades.facultad,
+          },
+        },
+        usuarios: {
+          id: detalle.usuarios.id,
+          nombre: detalle.usuarios.username,
+          apellido: detalle.usuarios.nombre_completo,
+          perfil: {
+            id: detalle.usuarios.perfiles.id,
+            nombre: detalle.usuarios.perfiles.nombre_perfil,
+          },
+        },
+      })),
+    }));
   }
+  
 
   findOne(id: number) {
     return `This action returns a #${id} backup`;

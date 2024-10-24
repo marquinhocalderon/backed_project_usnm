@@ -12,6 +12,9 @@ export class Facultade {
     @Column()
     facultad: string;
 
+    @Column({nullable: true})
+    imagen: string;
+
     @ManyToOne(() => Usuario, (usuario) => usuario.id, {
         // cascade: true,
         eager: true, // para que traiga todos los datos de la columna relacionada

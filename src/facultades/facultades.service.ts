@@ -15,40 +15,39 @@ export class FacultadesService {
     @InjectRepository(Usuario) private usuarioRepositorio: Repository<Usuario>,
   ) {}
 
-  async create(createFacultadeDto: CreateFacultadeDto) {
-
+  async create(createFacultadeDto: CreateFacultadeDto, imagenes: any) {
+    const imagen_url_1 = imagenes[0] ?? null;
 
     const facultadEncontrado = await this.facultadRepositorio.findOneBy({
-        facultad: createFacultadeDto.facultad,
+      facultad: createFacultadeDto.facultad,
     });
 
     if (facultadEncontrado) {
-        throw new HttpException(
-            'Facultad encontrada en la BD',
-            HttpStatus.CONFLICT,
-        );
+      return { message: 'Esta Facultad ya esta registrada', success: false };
     }
 
     const usuarioEncontrado = await this.usuarioRepositorio.findOneBy({
-        id: parseInt(createFacultadeDto.id_usuario, 10),
+      id: parseInt(createFacultadeDto.id_usuario, 10),
     });
 
-
     if (usuarioEncontrado === null) {
-        throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+      return { message: 'Esta Usuario no esta registrado', success: false };
     }
 
     // Crear un nuevo usuario con la información proporcionada y el nombre del archivo
     const nuevodato = this.facultadRepositorio.create({
-        facultad: createFacultadeDto.facultad,
-        usuarios: usuarioEncontrado,
+      facultad: createFacultadeDto.facultad,
+      usuarios: usuarioEncontrado,
+      imagen: imagen_url_1,
     });
 
     await this.facultadRepositorio.save(nuevodato);
 
-    return { message: 'Se registró correctamente' };
-}
-
+    return {
+      message: 'Se registró correctamente',
+      success: true,
+    };
+  }
 
   findAll() {
     const perfiles = this.facultadRepositorio.find({
@@ -74,26 +73,32 @@ export class FacultadesService {
     return facultadEncontrado;
   }
 
- async update(id: number, updateFacultadeDto: UpdateFacultadeDto) {
+  async update(updateFacultadeDto: UpdateFacultadeDto, imagenes: any) {
+    const imagen_url_1 =
+      imagenes && imagenes.length > 0 ? imagenes[0].filename : null;
+
     const facultadExistente = await this.facultadRepositorio.findOneBy({
-      id: id,
+      id: Number(updateFacultadeDto.id_facultad),
     });
 
     if (!facultadExistente) {
-      throw new HttpException('Dato no existe', HttpStatus.NOT_FOUND);
+      return {
+        message: 'Facultad No Existe',
+        success: false,
+      };
     }
 
-    // Comprobar la existencia de nuevo dato
+    // Verificar si el nombre de la facultad cambió y comprobar duplicados
     if (updateFacultadeDto.facultad !== facultadExistente.facultad) {
       const mismoNombre = await this.facultadRepositorio.findOneBy({
         facultad: updateFacultadeDto.facultad,
       });
 
       if (mismoNombre) {
-        throw new HttpException(
-          'Dato ya existe',
-          HttpStatus.CONFLICT,
-        );
+        return {
+          message: 'Facultad ya Existe este Nombre',
+          success: false,
+        };
       }
     }
 
@@ -102,41 +107,44 @@ export class FacultadesService {
     });
 
     if (!usuarioExistente) {
-      throw new HttpException('Dato no existe', HttpStatus.NOT_FOUND);
+      return {
+        message: 'Usuario No Existe',
+        success: false,
+      };
     }
 
-
-    // Crear un nuevo usuario con la información proporcionada y el nombre del archivo
-    const nuevodato = this.facultadRepositorio.create({
+    // Crear un objeto con los datos actualizados y conservar la imagen si no se envía una nueva
+    const datosActualizados = {
       facultad: updateFacultadeDto.facultad,
       usuarios: usuarioExistente,
-  });
+      imagen: imagen_url_1 ?? facultadExistente.imagen, // Mantener la imagen existente si no hay una nueva
+    };
 
-  await this.facultadRepositorio.update(id, nuevodato);
+    await this.facultadRepositorio.update(
+      updateFacultadeDto.id_facultad,
+      datosActualizados,
+    );
 
-
-
-    return { message: 'Se actualizó correctamente' };
-}
-
-async remove(id: number) {
-  const existeEsteDato = await this.facultadRepositorio.findOneBy({
-    id: id,
-    estado: true
-  });
-
-  if (!existeEsteDato) {
-    throw new HttpException('Dato no encontrado', HttpStatus.NOT_FOUND);
+    return { message: 'Se actualizó correctamente', success: true };
   }
 
-  if (!existeEsteDato.estado) {
-    throw new HttpException('Dato Eliminado', HttpStatus.NOT_FOUND);
+  async remove(id: number) {
+    const existeEsteDato = await this.facultadRepositorio.findOneBy({
+      id: id,
+      estado: true,
+    });
+
+    if (!existeEsteDato) {
+      throw new HttpException('Dato no encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    if (!existeEsteDato.estado) {
+      throw new HttpException('Dato Eliminado', HttpStatus.NOT_FOUND);
+    }
+
+    // Actualizar el estado del perfil a false
+    await this.facultadRepositorio.update(id, { estado: false });
+
+    return { message: 'Dato eliminado exitosamente' };
   }
-
-  // Actualizar el estado del perfil a false
-  await this.facultadRepositorio.update(id, { estado: false });
-
-  return { message: 'Dato eliminado exitosamente' };
-}
-
 }

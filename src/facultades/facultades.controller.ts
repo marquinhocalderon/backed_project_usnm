@@ -154,7 +154,7 @@ export class FacultadesController {
 
   @Patch() // Cambiado a PUT
   @Permission('update-facultades')
-  @UseInterceptors(FilesInterceptor('imagenes', 10, { 
+  @UseInterceptors(FilesInterceptor('imagenes', 1, { 
     storage: diskStorage({
       destination: (req, file, cb) => {
         const tempPath = './temp/uploads/facultadesimagenes';

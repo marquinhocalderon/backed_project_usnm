@@ -106,6 +106,63 @@ export class BackupsService {
     }));
   }
   
+
+  async findAllBackupFacultad(facultadId: number): Promise<any[]> {
+    const backups = await this.backupsRepositorio.find({
+      relations: [
+        'detallebackups', 
+        'detallebackups.gabinetes', 
+        'detallebackups.usuarios', 
+        'detallebackups.usuarios.perfiles', 
+        'detallebackups.gabinetes.facultades'
+      ],
+      where: {
+        detallebackups: {
+          gabinetes: {
+            facultades: {
+              id: facultadId, // Filtrar por id de facultad
+            },
+          },
+        },
+      },
+    });
+  
+    return backups.map((backup) => ({
+      id_backup: backup.id,
+      estado: backup.estado,
+      historial_subidos: backup.detallebackups
+        // Ordenar los detalles por id de forma descendente
+        .sort((a, b) => b.id - a.id) // Ordenar por id de mayor a menor
+        .map((detalle) => ({
+          id: detalle.id,
+          fecha_registro: detalle.fecha,
+          documentos: detalle.backups_json,
+          gabinetes: {
+            id: detalle.gabinetes.id,
+            nombre: detalle.gabinetes.nombre_gabinete,
+            imagenes: [
+              { imagen: detalle.gabinetes.imagen_url_1 },
+              { imagen: detalle.gabinetes.imagen_url_2 },
+              { imagen: detalle.gabinetes.imagen_url_3 },
+            ],
+            facultad: {
+              id: detalle.gabinetes.facultades.id,
+              nombre: detalle.gabinetes.facultades.facultad,
+            },
+          },
+          usuarios: {
+            id: detalle.usuarios.id,
+            nombre: detalle.usuarios.username,
+            apellido: detalle.usuarios.nombre_completo,
+            perfil: {
+              id: detalle.usuarios.perfiles.id,
+              nombre: detalle.usuarios.perfiles.nombre_perfil,
+            },
+          },
+        })),
+    }));
+  }
+  
   
 
   findOne(id: number) {

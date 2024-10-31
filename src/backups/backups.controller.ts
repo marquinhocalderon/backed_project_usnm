@@ -114,11 +114,12 @@ export class BackupsController {
 
   }
 
-  @Get(':id')
-  @ApiBody({ type: [BackupDto] })
+
+
+  @Get('facultad/:id')
   @Permission('read-backups')
   findOne(@Param('id') id: string) {
-    return this.backupsService.findOne(+id);
+    return this.backupsService.findAllBackupFacultad(+id);
 
   }
 

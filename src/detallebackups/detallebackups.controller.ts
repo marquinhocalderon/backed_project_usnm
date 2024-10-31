@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DetallebackupsService } from './detallebackups.service';
 import { CreateDetallebackupDto } from './dto/create-detallebackup.dto';
 import { UpdateDetallebackupDto } from './dto/update-detallebackup.dto';
-
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
+import { Permission } from 'src/auth/decorators/permission.decorator';
+@UseGuards(AuthGuard)
+@ApiTags('Detallebackups')
 @Controller('detallebackups')
 export class DetallebackupsController {
   constructor(private readonly detallebackupsService: DetallebackupsService) {}
@@ -10,6 +14,7 @@ export class DetallebackupsController {
 
 
   @Get()
+  @Permission('read-detallebackups')
   findAll() {
     return this.detallebackupsService.findAll();
   }

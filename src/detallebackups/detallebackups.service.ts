@@ -94,7 +94,10 @@ export class DetallebackupsService {
   }
 
   findAll() {
-    return `This action returns all detallebackups`;
+    const detallebackups = this.detallebackupsRepositorio.find({
+      order: {id: 'DESC'},
+    });
+    return detallebackups;
   }
 
   findOne(id: number) {

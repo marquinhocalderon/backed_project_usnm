@@ -165,7 +165,7 @@ export class DetallepermisosService {
 
     // Ordenar módulos por id en forma descendente
     const sortedModulos = Array.from(modulos.values()).sort(
-      (a, b) => b.id - a.id,
+      (a, b) => a.id - b.id,
     );
 
     // Filtrar los módulos habilitados y eliminar los submódulos

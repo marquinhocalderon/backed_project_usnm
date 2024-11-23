@@ -91,7 +91,7 @@ export class UsuariosController {
     return this.usuariosService.update(+id, updateUsuarioDto);
   }
 
-
+  @Permission('delete-usuarios')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usuariosService.remove(+id);

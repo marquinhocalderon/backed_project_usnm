@@ -5,17 +5,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from './entities/usuario.entity';
 import { Perfile } from '../perfiles/entities/perfile.entity';
-import * as bcryptjs from 'bcryptjs'
+import * as bcryptjs from 'bcryptjs';
 import { Detallepermiso } from '../detallepermisos/entities/detallepermiso.entity';
 import { DetallepermisosService } from '../detallepermisos/detallepermisos.service';
+import { Facultade } from 'src/facultades/entities/facultade.entity';
+import { Gabinentes } from 'src/gabinetes/entities/gabinete.entity';
+import { DetalleBackups } from 'src/detallebackups/entities/detallebackup.entity';
 @Injectable()
 export class UsuariosService {
-  constructor(@InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
+  constructor(
+    @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
     @InjectRepository(Perfile) private perfilRepository: Repository<Perfile>,
     @InjectRepository(Detallepermiso)
     private detallePermisoRepository: Repository<Detallepermiso>,
-    private readonly detallepermisosService: DetallepermisosService,) { }
-
+    private readonly detallepermisosService: DetallepermisosService,
+    @InjectRepository(Facultade) private facultad: Repository<Facultade>,
+    @InjectRepository(Gabinentes) private gabinete: Repository<Gabinentes>,
+    @InjectRepository(DetalleBackups)
+    private backup: Repository<DetalleBackups>,
+  ) {}
 
   // async create(createUsuarioDto: CreateUsuarioDto, imagenFilename: string) {
   //   const perfilEncontrado = await this.perfilRepository.findOneBy({
@@ -54,10 +62,9 @@ export class UsuariosService {
       where: {
         username: usuario,
       },
-      select: ["id", "username", "password", "perfiles"]
+      select: ['id', 'username', 'password', 'perfiles'],
     });
   }
-
 
   async create(createUsuarioDto: CreateUsuarioDto) {
     const perfilEncontrado = await this.perfilRepository.findOneBy({
@@ -90,7 +97,6 @@ export class UsuariosService {
     await this.detallepermisosService.create(nuevodato.id);
 
     return { message: 'Se registró correctamente' };
-
   }
 
   findAll() {
@@ -123,67 +129,111 @@ export class UsuariosService {
     const usuarioExistente = await this.usuarioRepository.findOneBy({ id });
 
     if (!usuarioExistente) {
-        throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
 
     // Verificar si el nuevo perfil existe y está activo
     const perfilEncontrado = await this.perfilRepository.findOneBy({
-        id: parseInt(updateUsuarioDto.id_perfil, 10),
-        estado: true,
+      id: parseInt(updateUsuarioDto.id_perfil, 10),
+      estado: true,
     });
 
     if (!perfilEncontrado) {
-        throw new HttpException('Perfil no encontrado o inactivo', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Perfil no encontrado o inactivo',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     // Verificar si el nombre de usuario es diferente y si ya existe otro usuario con el mismo nombre
-    if (updateUsuarioDto.username && updateUsuarioDto.username !== usuarioExistente.username) {
-        const usuarioEncontrado = await this.usuarioRepository.findOneBy({
-            username: updateUsuarioDto.username,
-        });
+    if (
+      updateUsuarioDto.username &&
+      updateUsuarioDto.username !== usuarioExistente.username
+    ) {
+      const usuarioEncontrado = await this.usuarioRepository.findOneBy({
+        username: updateUsuarioDto.username,
+      });
 
-        if (usuarioEncontrado) {
-            throw new HttpException('El nombre de usuario ya existe', HttpStatus.CONFLICT);
-        }
+      if (usuarioEncontrado) {
+        throw new HttpException(
+          'El nombre de usuario ya existe',
+          HttpStatus.CONFLICT,
+        );
+      }
     }
 
     // Preparar los datos de actualización
     const datosActualizacion: any = {
-        username: updateUsuarioDto.username || usuarioExistente.username, // Mantener el nombre de usuario actual si no se proporciona uno nuevo
-        nombre_completo: updateUsuarioDto.nombre_completo || usuarioExistente.nombre_completo, // Mantener el nombre completo actual si no se proporciona uno nuevo
-        perfiles: perfilEncontrado, // Actualizar la relación con el nuevo perfil
+      username: updateUsuarioDto.username || usuarioExistente.username, // Mantener el nombre de usuario actual si no se proporciona uno nuevo
+      nombre_completo:
+        updateUsuarioDto.nombre_completo || usuarioExistente.nombre_completo, // Mantener el nombre completo actual si no se proporciona uno nuevo
+      perfiles: perfilEncontrado, // Actualizar la relación con el nuevo perfil
     };
 
     // Solo actualizar la contraseña si se proporciona una nueva
     if (updateUsuarioDto.password) {
-        datosActualizacion.password = await bcryptjs.hash(updateUsuarioDto.password, 10);
+      datosActualizacion.password = await bcryptjs.hash(
+        updateUsuarioDto.password,
+        10,
+      );
     }
 
     // Actualizar el usuario
     await this.usuarioRepository.update(id, datosActualizacion);
 
     return { message: 'Usuario actualizado correctamente' };
-}
-
-
-
+  }
 
   async remove(id: number) {
-    const usuarioExistente = await this.usuarioRepository.findOneBy({
-      id: id,
-      estado: true
+    // Buscar el usuario y cargar sus relaciones
+    const usuario = await this.usuarioRepository.findOne({
+      where: { id },
+      relations: ['detalleBackups', 'gabinetes', 'facultades'], // Relacionar las entidades
     });
-
+  
+    if (!usuario) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
+  
+    // Mensaje para indicar en qué entidad está siendo usado el usuario
+    const relatedEntities: string[] = [];
+  
+    if (usuario.detalleBackups.length > 0) {
+      relatedEntities.push('DetalleBackups');
+    }
+    if (usuario.gabinetes.length > 0) {
+      relatedEntities.push('Gabinetes');
+    }
+    if (usuario.facultades.length > 0) {
+      relatedEntities.push('Facultades');
+    }
+  
+    // Si el usuario tiene relaciones, generar un mensaje de conflicto
+    if (relatedEntities.length > 0) {
+      throw new HttpException(
+        `No se puede eliminar el usuario porque está siendo usado en uno de estos modulos: ${relatedEntities.join(', ')}`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  
+    // Buscar el usuario por ID y estado activo
+    const usuarioExistente = await this.usuarioRepository.findOne({
+      where: { id, estado: true },
+    });
+  
     if (!usuarioExistente) {
-      throw new HttpException('Dato no encontrado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario no encontrado o ya eliminado', HttpStatus.NOT_FOUND);
     }
-
+  
+    // Si el usuario está marcado como eliminado (estado false)
     if (!usuarioExistente.estado) {
-      throw new HttpException('Dato Eliminado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuario ya eliminado', HttpStatus.NOT_FOUND);
     }
-
-    // Actualizar el estado del perfil a false
+  
+    // Actualizar el estado del usuario a false (marcarlo como eliminado)
     await this.usuarioRepository.update(id, { estado: false });
+  
     return { message: 'Usuario eliminado correctamente' };
   }
+  
 }

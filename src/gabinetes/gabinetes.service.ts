@@ -269,7 +269,40 @@ export class GabinetesService {
 
 
 
-  remove(id: number) {
-    return `This action removes a #${id} gabinete`;
+async remove(id: number) {
+  // Buscar el gabinete y cargar sus relaciones
+  const gabinete = await this.gabineteRepositorip.findOne({
+    where: { id },
+    relations: ['detallebackups'], // Cargar las relaciones necesarias
+  });
+
+  // Verificar si el gabinete existe
+  if (!gabinete) {
+    throw new HttpException('Gabinete no encontrado', HttpStatus.NOT_FOUND);
   }
+
+  // Verificar si tiene relaciones activas
+  if (gabinete.detallebackups && gabinete.detallebackups.length > 0) {
+    throw new HttpException(
+      `No se puede eliminar el gabinete porque está siendo usado en el módulo: Backups y el Historial de Backups`,
+      HttpStatus.CONFLICT,
+    );
+  }
+
+  // Buscar si el gabinete está activo
+  const gabineteactivo = await this.gabineteRepositorip.findOneBy({
+    id,
+    estado: true,
+  });
+
+  if (!gabineteactivo) {
+    throw new HttpException('Gabinete ya está eliminado o no existe', HttpStatus.NOT_FOUND);
+  }
+
+  // Actualizar el estado del gabinete a `false`
+  await this.gabineteRepositorip.update(id, { estado: false });
+
+  return { message: 'Gabinete eliminado exitosamente' };
+}
+
 }

@@ -76,6 +76,7 @@ export class DetallepermisosService {
     // Obtener todos los detalles de permisos
     const detallePermisos = await this.detallePermisoRepository.find({
       relations: ['usuario', 'sub_modulo', 'sub_modulo.modulos'],
+      where: { usuario: { estado: true } },
     });
 
     // Agrupar datos por usuario

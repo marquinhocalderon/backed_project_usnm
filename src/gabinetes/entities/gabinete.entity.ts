@@ -1,6 +1,7 @@
+import { DetalleBackups } from "src/detallebackups/entities/detallebackup.entity";
 import { Facultade } from "src/facultades/entities/facultade.entity";
 import { Usuario } from "src/usuarios/entities/usuario.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "gabinetes"})
 export class Gabinentes {
@@ -49,6 +50,12 @@ export class Gabinentes {
 
     @Column({default: true})
     estado: boolean;
+
+
+      
+    @OneToMany(() => DetalleBackups, (detallebackups) => detallebackups.gabinetes, { cascade: true })
+    detallebackups: DetalleBackups[];
+
 
 
 

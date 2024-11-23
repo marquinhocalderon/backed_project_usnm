@@ -1,5 +1,6 @@
+import { Gabinentes } from "src/gabinetes/entities/gabinete.entity";
 import { Usuario } from "src/usuarios/entities/usuario.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: "facultades"})
 export class Facultade {
@@ -26,6 +27,8 @@ export class Facultade {
     @Column({ default: true })
     estado: boolean;
 
-
+  
+    @OneToMany(() => Gabinentes, (gabinete) => gabinete.facultades, { cascade: true })
+    gabinetes: Gabinentes[];
 
 }

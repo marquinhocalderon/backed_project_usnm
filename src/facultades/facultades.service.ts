@@ -6,6 +6,7 @@ import { Facultade } from './entities/facultade.entity';
 import { Repository } from 'typeorm';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { Console } from 'console';
+import { Gabinentes } from 'src/gabinetes/entities/gabinete.entity';
 
 @Injectable()
 export class FacultadesService {
@@ -13,6 +14,7 @@ export class FacultadesService {
     @InjectRepository(Facultade)
     private facultadRepositorio: Repository<Facultade>,
     @InjectRepository(Usuario) private usuarioRepositorio: Repository<Usuario>,
+    @InjectRepository(Gabinentes) private gabinete: Repository<Gabinentes>,
   ) {}
 
   async create(createFacultadeDto: CreateFacultadeDto, imagenes: any) {
@@ -50,12 +52,14 @@ export class FacultadesService {
   }
 
   findAll() {
-    const perfiles = this.facultadRepositorio.find({
+    const facultade = this.facultadRepositorio.find({
       order: { id: 'DESC' },
+      where: { estado: true },
     });
 
-    return perfiles;
+    return facultade;
   }
+
   async findOne(id: number) {
     const facultadEncontrado = await this.facultadRepositorio.findOneBy({
       id: id,
@@ -129,22 +133,39 @@ export class FacultadesService {
   }
 
   async remove(id: number) {
-    const existeEsteDato = await this.facultadRepositorio.findOneBy({
-      id: id,
+    // Buscar el gabinete y cargar sus relaciones
+    const facultad = await this.facultadRepositorio.findOne({
+      where: { id },
+      relations: ['gabinetes'], // Cargar las relaciones necesarias
+    });
+  
+    // Verificar si el gabinete existe
+    if (!facultad) {
+      throw new HttpException('Gabinete no encontrado', HttpStatus.NOT_FOUND);
+    }
+  
+    // Verificar si tiene relaciones activas
+    if (facultad.gabinetes && facultad.gabinetes.length > 0) {
+      throw new HttpException(
+        `No se puede eliminar la facultad porque está siendo usado en el módulo: Gabinetes`,
+        HttpStatus.CONFLICT,
+      );
+    }
+  
+    // Buscar si el gabinete está activo
+    const facultadactivo = await this.facultadRepositorio.findOneBy({
+      id,
       estado: true,
     });
-
-    if (!existeEsteDato) {
-      throw new HttpException('Dato no encontrado', HttpStatus.NOT_FOUND);
+  
+    if (!facultadactivo) {
+      throw new HttpException('La facultad ya está eliminado o no existe', HttpStatus.NOT_FOUND);
     }
-
-    if (!existeEsteDato.estado) {
-      throw new HttpException('Dato Eliminado', HttpStatus.NOT_FOUND);
-    }
-
-    // Actualizar el estado del perfil a false
+  
+    // Actualizar el estado del gabinete a `false`
     await this.facultadRepositorio.update(id, { estado: false });
-
-    return { message: 'Dato eliminado exitosamente' };
+  
+    return { message: 'Facultad eliminada exitosamente' };
   }
+  
 }

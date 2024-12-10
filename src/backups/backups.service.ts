@@ -70,41 +70,45 @@ export class BackupsService {
       ], // Incluir las relaciones necesarias
     });
   
-    return backups.map((backup) => ({
-      id_backup: backup.id,
-      estado: backup.estado,
-      historial_subidos: backup.detallebackups
-        // Ordenar los detalles por id de forma descendente
-        .sort((a, b) => b.id - a.id) // Ordenar por id de mayor a menor
-        .map((detalle) => ({
-          id: detalle.id,
-          fecha_registro: detalle.fecha,
-          documentos: detalle.backups_json,
-          gabinetes: {
-            id: detalle.gabinetes.id,
-            nombre: detalle.gabinetes.nombre_gabinete,
-            imagenes: [
-              { imagen: detalle.gabinetes.imagen_url_1 },
-              { imagen: detalle.gabinetes.imagen_url_2 },
-              { imagen: detalle.gabinetes.imagen_url_3 },
-            ],
-            facultad: {
-              id: detalle.gabinetes.facultades.id,
-              nombre: detalle.gabinetes.facultades.facultad,
+    // Filtrar backups donde `estado` sea true
+    return backups
+      .filter((backup) => backup.estado === true)
+      .map((backup) => ({
+        id_backup: backup.id,
+        estado: backup.estado,
+        historial_subidos: backup.detallebackups
+          .filter((detalle) => detalle.estado === true) // Filtrar detalles con estado true
+          .sort((a, b) => b.id - a.id) // Ordenar por id de mayor a menor
+          .map((detalle) => ({
+            id: detalle.id,
+            fecha_registro: detalle.fecha,
+            documentos: detalle.backups_json,
+            gabinetes: {
+              id: detalle.gabinetes.id,
+              nombre: detalle.gabinetes.nombre_gabinete,
+              imagenes: [
+                { imagen: detalle.gabinetes.imagen_url_1 },
+                { imagen: detalle.gabinetes.imagen_url_2 },
+                { imagen: detalle.gabinetes.imagen_url_3 },
+              ],
+              facultad: {
+                id: detalle.gabinetes.facultades.id,
+                nombre: detalle.gabinetes.facultades.facultad,
+              },
             },
-          },
-          usuarios: {
-            id: detalle.usuarios.id,
-            nombre: detalle.usuarios.username,
-            apellido: detalle.usuarios.nombre_completo,
-            perfil: {
-              id: detalle.usuarios.perfiles.id,
-              nombre: detalle.usuarios.perfiles.nombre_perfil,
+            usuarios: {
+              id: detalle.usuarios.id,
+              nombre: detalle.usuarios.username,
+              apellido: detalle.usuarios.nombre_completo,
+              perfil: {
+                id: detalle.usuarios.perfiles.id,
+                nombre: detalle.usuarios.perfiles.nombre_perfil,
+              },
             },
-          },
-        })),
-    }));
+          })),
+      }));
   }
+  
   
 
   async findAllBackupFacultad(facultadId: number): Promise<any[]> {
@@ -114,7 +118,7 @@ export class BackupsService {
         'detallebackups.gabinetes', 
         'detallebackups.usuarios', 
         'detallebackups.usuarios.perfiles', 
-        'detallebackups.gabinetes.facultades'
+        'detallebackups.gabinetes.facultades',
       ],
       where: {
         detallebackups: {
@@ -127,41 +131,44 @@ export class BackupsService {
       },
     });
   
-    return backups.map((backup) => ({
-      id_backup: backup.id,
-      estado: backup.estado,
-      historial_subidos: backup.detallebackups
-        // Ordenar los detalles por id de forma descendente
-        .sort((a, b) => b.id - a.id) // Ordenar por id de mayor a menor
-        .map((detalle) => ({
-          id: detalle.id,
-          fecha_registro: detalle.fecha,
-          documentos: detalle.backups_json,
-          gabinetes: {
-            id: detalle.gabinetes.id,
-            nombre: detalle.gabinetes.nombre_gabinete,
-            imagenes: [
-              { imagen: detalle.gabinetes.imagen_url_1 },
-              { imagen: detalle.gabinetes.imagen_url_2 },
-              { imagen: detalle.gabinetes.imagen_url_3 },
-            ],
-            facultad: {
-              id: detalle.gabinetes.facultades.id,
-              nombre: detalle.gabinetes.facultades.facultad,
+    return backups
+      .filter((backup) => backup.estado === true) // Filtrar backups con estado true
+      .map((backup) => ({
+        id_backup: backup.id,
+        estado: backup.estado,
+        historial_subidos: backup.detallebackups
+          .filter((detalle) => detalle.estado === true) // Filtrar detalles con estado true
+          .sort((a, b) => b.id - a.id) // Ordenar por id de mayor a menor
+          .map((detalle) => ({
+            id: detalle.id,
+            fecha_registro: detalle.fecha,
+            documentos: detalle.backups_json,
+            gabinetes: {
+              id: detalle.gabinetes.id,
+              nombre: detalle.gabinetes.nombre_gabinete,
+              imagenes: [
+                { imagen: detalle.gabinetes.imagen_url_1 },
+                { imagen: detalle.gabinetes.imagen_url_2 },
+                { imagen: detalle.gabinetes.imagen_url_3 },
+              ],
+              facultad: {
+                id: detalle.gabinetes.facultades.id,
+                nombre: detalle.gabinetes.facultades.facultad,
+              },
             },
-          },
-          usuarios: {
-            id: detalle.usuarios.id,
-            nombre: detalle.usuarios.username,
-            apellido: detalle.usuarios.nombre_completo,
-            perfil: {
-              id: detalle.usuarios.perfiles.id,
-              nombre: detalle.usuarios.perfiles.nombre_perfil,
+            usuarios: {
+              id: detalle.usuarios.id,
+              nombre: detalle.usuarios.username,
+              apellido: detalle.usuarios.nombre_completo,
+              perfil: {
+                id: detalle.usuarios.perfiles.id,
+                nombre: detalle.usuarios.perfiles.nombre_perfil,
+              },
             },
-          },
-        })),
-    }));
+          })),
+      }));
   }
+  
   
   
 

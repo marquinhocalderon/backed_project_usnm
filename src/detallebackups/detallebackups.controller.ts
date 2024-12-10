@@ -30,6 +30,7 @@ export class DetallebackupsController {
   }
 
   @Delete(':id')
+  @Permission('delete-detallebackups')
   remove(@Param('id') id: string) {
     return this.detallebackupsService.remove(+id);
   }

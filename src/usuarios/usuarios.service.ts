@@ -187,13 +187,18 @@ export class UsuariosService {
   async remove(id: number) {
     // Buscar el usuario y cargar sus relaciones
     const usuario = await this.usuarioRepository.findOne({
-      where: { id },
+      where: { id, estado: true },
       relations: ['detalleBackups', 'gabinetes', 'facultades'], // Relacionar las entidades
     });
   
     if (!usuario) {
       throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
     }
+  
+    // Filtrar las relaciones para incluir solo las que tienen estado: true
+    usuario.detalleBackups = usuario.detalleBackups.filter((detalle) => detalle.estado === true);
+    usuario.gabinetes = usuario.gabinetes.filter((gabinete) => gabinete.estado === true);
+    usuario.facultades = usuario.facultades.filter((facultad) => facultad.estado === true);
   
     // Mensaje para indicar en qué entidad está siendo usado el usuario
     const relatedEntities: string[] = [];
@@ -208,15 +213,15 @@ export class UsuariosService {
       relatedEntities.push('Facultades');
     }
   
-    // Si el usuario tiene relaciones, generar un mensaje de conflicto
+    // Si el usuario tiene relaciones activas, generar un mensaje de conflicto
     if (relatedEntities.length > 0) {
       throw new HttpException(
-        `No se puede eliminar el usuario porque está siendo usado en uno de estos modulos: ${relatedEntities.join(', ')}`,
+        `No se puede eliminar el usuario porque está siendo usado en uno de estos módulos: ${relatedEntities.join(', ')}`,
         HttpStatus.CONFLICT,
       );
     }
   
-    // Buscar el usuario por ID y estado activo
+    // Verificar si el usuario está activo
     const usuarioExistente = await this.usuarioRepository.findOne({
       where: { id, estado: true },
     });
@@ -225,15 +230,11 @@ export class UsuariosService {
       throw new HttpException('Usuario no encontrado o ya eliminado', HttpStatus.NOT_FOUND);
     }
   
-    // Si el usuario está marcado como eliminado (estado false)
-    if (!usuarioExistente.estado) {
-      throw new HttpException('Usuario ya eliminado', HttpStatus.NOT_FOUND);
-    }
-  
     // Actualizar el estado del usuario a false (marcarlo como eliminado)
     await this.usuarioRepository.update(id, { estado: false });
   
     return { message: 'Usuario eliminado correctamente' };
   }
+  
   
 }

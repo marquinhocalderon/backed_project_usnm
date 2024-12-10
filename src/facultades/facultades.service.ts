@@ -133,39 +133,43 @@ export class FacultadesService {
   }
 
   async remove(id: number) {
-    // Buscar el gabinete y cargar sus relaciones
+    // Buscar la facultad y cargar sus relaciones
     const facultad = await this.facultadRepositorio.findOne({
-      where: { id },
+      where: { id, estado: true },
       relations: ['gabinetes'], // Cargar las relaciones necesarias
     });
   
-    // Verificar si el gabinete existe
+    // Verificar si la facultad existe
     if (!facultad) {
-      throw new HttpException('Gabinete no encontrado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Facultad no encontrada', HttpStatus.NOT_FOUND);
     }
   
-    // Verificar si tiene relaciones activas
-    if (facultad.gabinetes && facultad.gabinetes.length > 0) {
+    // Filtrar los `gabinetes` para incluir solo los que tienen `estado: true`
+    facultad.gabinetes = facultad.gabinetes.filter((gabinete) => gabinete.estado === true);
+  
+    // Verificar si tiene relaciones activas después del filtro
+    if (facultad.gabinetes.length > 0) {
       throw new HttpException(
         `No se puede eliminar la facultad porque está siendo usado en el módulo: Gabinetes`,
         HttpStatus.CONFLICT,
       );
     }
   
-    // Buscar si el gabinete está activo
+    // Buscar si la facultad está activa
     const facultadactivo = await this.facultadRepositorio.findOneBy({
       id,
       estado: true,
     });
   
     if (!facultadactivo) {
-      throw new HttpException('La facultad ya está eliminado o no existe', HttpStatus.NOT_FOUND);
+      throw new HttpException('La facultad ya está eliminada o no existe', HttpStatus.NOT_FOUND);
     }
   
-    // Actualizar el estado del gabinete a `false`
+    // Actualizar el estado de la facultad a `false`
     await this.facultadRepositorio.update(id, { estado: false });
   
     return { message: 'Facultad eliminada exitosamente' };
   }
+  
   
 }

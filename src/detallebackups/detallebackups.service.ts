@@ -73,6 +73,7 @@ export class DetallebackupsService {
   async verficarSiHayCreadoConeseGabinete(id_gabinete: number) {
     const gabineteEncontrado = await this.gabineteRepositorip.findOneBy({
       id: id_gabinete,
+      estado: true,
     });
 
     const detalleBackupEncontrado = await this.detallebackupsRepositorio.findOneBy({
@@ -96,6 +97,7 @@ export class DetallebackupsService {
   findAll() {
     const detallebackups = this.detallebackupsRepositorio.find({
       order: {id: 'DESC'},
+      where: { estado: true },
     });
     return detallebackups;
   }
@@ -108,7 +110,28 @@ export class DetallebackupsService {
     return `This action updates a #${id} detallebackup`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} detallebackup`;
+  async remove(id: number) {
+    // Buscar el registro con el ID y estado activo
+    const detalleBackupEncontrado = await this.detallebackupsRepositorio.findOne({
+      where: { id: id, estado: true },
+    });
+  
+    // Si no se encuentra el registro, devolver un mensaje de error
+    if (!detalleBackupEncontrado) {
+      return {
+        message: 'Detalle backup no encontrado',
+        success: false,
+      };
+    }
+  
+    // Actualizar el estado a false
+    await this.detallebackupsRepositorio.update({ id }, { estado: false });
+  
+    // Retornar un mensaje de éxito
+    return {
+      message: 'Estado del detalle backup actualizado a false',
+      success: true,
+    };
   }
+  
 }
